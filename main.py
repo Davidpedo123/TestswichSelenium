@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.edge.options import Options
+import pyautogui
 
 options = Options()
 options.add_argument("--ignore-certificate-errors")
@@ -43,20 +44,23 @@ def loginApp(driver, username, password,form):
     login_button.click()
 
  
-    time.sleep(2)
+    time.sleep(1)
     
-    #addTest(form)
+    addTest(form)
 
    
     print("Revisa si el login fue exitoso en la página antes de cerrar el navegador.")
 
 
-    #time.sleep(5)
+    time.sleep(3)
     
     EditTest()
     
-    time.sleep(5)  
+    time.sleep(3)  
 
+    DeleteTest()
+    
+    time.sleep(3)
 
     driver.quit()
 
@@ -111,6 +115,20 @@ def EditTest():
     time.sleep(5)
     button_submit_return = driver.find_element("id", "return")
     button_submit_return.click()
+    time.sleep(3)
+    
+
+def DeleteTest():
+    
+  
+    first_row = driver.find_element(By.XPATH, "//table[@id='myTable']//tr[@class='contactTableBodyRow'][1]")
+    first_row.click()
+    time.sleep(3)
+    
+    button_delete = driver.find_element("id", "delete")
+    button_delete.click()
+    time.sleep(2)
+    pyautogui.click(x=780, y=220)
     time.sleep(3)
     
     
