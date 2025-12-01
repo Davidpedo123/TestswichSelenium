@@ -43,15 +43,19 @@ def loginApp(driver, username, password,form):
     login_button.click()
 
  
-    time.sleep(5)
+    time.sleep(2)
     
-    addTest(form)
+    #addTest(form)
 
    
     print("Revisa si el login fue exitoso en la página antes de cerrar el navegador.")
 
 
-    time.sleep(10)  
+    #time.sleep(5)
+    
+    EditTest()
+    
+    time.sleep(5)  
 
 
     driver.quit()
@@ -88,8 +92,26 @@ def addTest(form):
     time.sleep(5)
     
     
+def EditTest():
     
+  
+    first_row = driver.find_element(By.XPATH, "//table[@id='myTable']//tr[@class='contactTableBodyRow'][1]")
+    first_row.click()
+    time.sleep(3)
     
+    edit_button = driver.find_element("id", "edit-contact")
+    edit_button.click()
+    time.sleep(2)
+    firsnameField = driver.find_element("id", "firstName") 
+    firsnameField.clear() 
+    
+    firsnameField.send_keys("PruebaPasada")
+    button_submit = driver.find_element("id", "submit")
+    button_submit.click()
+    time.sleep(5)
+    button_submit_return = driver.find_element("id", "return")
+    button_submit_return.click()
+    time.sleep(3)
     
     
 loginApp(driver, "davidtejadamoreta26@gmail.com", "David16261626#", form)
