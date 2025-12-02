@@ -7,12 +7,16 @@ from selenium.webdriver.edge.options import Options
 from selenium.webdriver.common.by import By
 import time
 
-
+# -----------------------------
+# Rutas relativas
+# -----------------------------
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 METRICS_DIR = PROJECT_ROOT / "metrics"
 METRICS_DIR.mkdir(parents=True, exist_ok=True)
 
-
+# -----------------------------
+# Datos del formulario
+# -----------------------------
 form = {
     "first_name": "David",
     "last_name": "Tejada",
@@ -27,12 +31,20 @@ form = {
     "country": "CountryName"
 }
 
-
+# -----------------------------
+# Utilidades
+# -----------------------------
 def elemento_existe(driver, by, value):
     return len(driver.find_elements(by, value)) > 0
 
+def take_screenshot(driver, name):
+    path = METRICS_DIR / f"{name}.png"
+    driver.save_screenshot(str(path))
+
+# -----------------------------
+# Funciones principales
+# -----------------------------
 def loginApp(driver, username, password):
-    """Solo login. No hace CRUD ni logout."""
     driver.get("https://thinking-tester-contact-list.herokuapp.com/")
     driver.find_element(By.ID, "email").send_keys(username)
     driver.find_element(By.ID, "password").send_keys(password)
@@ -56,6 +68,7 @@ def addTest(driver, form):
     countryField = driver.find_element(By.ID, "country")
     submitButton = driver.find_element(By.ID, "submit")
 
+    # Pruebas negativas y límites
     firsnameField.send_keys(form["first_name"])
     lastnameField.send_keys(form["last_name"])
     birthdateField.send_keys(form["date_of_birth"])
@@ -65,22 +78,18 @@ def addTest(driver, form):
     submitButton.click()
     time.sleep(1)
 
-
     emailField.clear()
     emailField.send_keys(form["email"])
     phoneField.clear()
     phoneField.send_keys(form["phone"])
-
 
     firsnameField.clear()
     firsnameField.send_keys("")
     submitButton.click()
     time.sleep(1)
 
-  
     firsnameField.clear()
     firsnameField.send_keys(form["first_name"])
-
 
     long_email = "a" * 250 + "@example.com"
     emailField.clear()
@@ -88,17 +97,14 @@ def addTest(driver, form):
     submitButton.click()
     time.sleep(1)
 
-
     emailField.clear()
     emailField.send_keys(form["email"])
-
 
     long_phone = "809" + "5" * 30
     phoneField.clear()
     phoneField.send_keys(long_phone)
     submitButton.click()
     time.sleep(1)
-
 
     phoneField.clear()
     phoneField.send_keys(form["phone"])
@@ -112,6 +118,9 @@ def addTest(driver, form):
 
     submitButton.click()
     time.sleep(1)
+
+    # Captura después de agregar contacto
+    take_screenshot(driver, "crud_add")
 
 def EditTest(driver):
     first_row = driver.find_element(By.XPATH, "//table[@id='myTable']//tr[@class='contactTableBodyRow'][1]")
@@ -131,6 +140,9 @@ def EditTest(driver):
     driver.find_element(By.ID, "return").click()
     time.sleep(1)
 
+    # Captura después de editar contacto
+    take_screenshot(driver, "crud_edit")
+
 def DeleteTest(driver):
     first_row = driver.find_element(By.XPATH, "//table[@id='myTable']//tr[@class='contactTableBodyRow'][1]")
     first_row.click()
@@ -141,6 +153,9 @@ def DeleteTest(driver):
 
     driver.switch_to.alert.accept()
     time.sleep(1)
+
+    # Captura después de eliminar contacto
+    take_screenshot(driver, "crud_delete")
 
 def Logout(driver):
     if elemento_existe(driver, By.ID, "logout"):
@@ -158,7 +173,9 @@ def negativeLoginTest(driver):
     assert len(error_elements) > 0, "No se encontró el mensaje de error"
     assert error_elements[0].text == "Incorrect username or password", "El mensaje de error no coincide"
 
-
+# -----------------------------
+# Fixture
+# -----------------------------
 @pytest.fixture
 def driver():
     options = Options()
@@ -167,10 +184,6 @@ def driver():
     drv = webdriver.Edge(service=service, options=options)
     yield drv
     drv.quit()
-
-def take_screenshot(driver, name):
-    path = METRICS_DIR / f"{name}.png"
-    driver.save_screenshot(str(path))  
 
 
 def test_login_correcto(driver):
@@ -185,7 +198,6 @@ def test_crud_contacto(driver):
     EditTest(driver)
     DeleteTest(driver)
     Logout(driver)
-    take_screenshot(driver, "crud_contacto")
 
 def test_login_incorrecto(driver):
     negativeLoginTest(driver)
